@@ -5,7 +5,7 @@ namespace Iankumu\Mpesa\Utils;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 trait MpesaHelper
 {
@@ -24,31 +24,39 @@ trait MpesaHelper
     }
 
     // Generate an AccessToken using the Consumer Key and Consumer Secret
-    public function generateAccessToken()
-    {
-        $consumer_key = config('mpesa.mpesa_consumer_key');
-        $consumer_secret = config('mpesa.mpesa_consumer_secret');
+public function generateAccessToken()
+{
+    $consumer_key = config('mpesa.mpesa_consumer_key');
+    $consumer_secret = config('mpesa.mpesa_consumer_secret');
 
-        $url = $this->url . '/oauth/v1/generate?grant_type=client_credentials';
+    $url = $this->url . '/oauth/v1/generate?grant_type=client_credentials';
 
-        $response = Http::withBasicAuth($consumer_key, $consumer_secret)
-            ->get($url);
+    $client = new Client();
+    
+    $response = $client->request('GET', $url, [
+        'auth' => [$consumer_key, $consumer_secret]
+    ]);
 
-        $result = json_decode($response);
+    $result = json_decode($response->getBody()->getContents());
 
-        return data_get($result, 'access_token');
-    }
+    return data_get($result, 'access_token');
+}
 
     // Common Format Of The Mpesa APIs.
-    public function MpesaRequest($url, $body)
-    {
+public function MpesaRequest($url, $body)
+{
+    $client = new Client();
 
-        $response = Http::withToken($this->generateAccessToken())
-            ->acceptJson()
-            ->post($url, $body);
+    $response = $client->request('POST', $url, [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $this->generateAccessToken(),
+            'Accept' => 'application/json',
+        ],
+        'json' => $body
+    ]);
 
-        return $response;
-    }
+    return $response;
+}
 
     // Generate a base64  password using the Safaricom PassKey and the Business ShortCode to be used in the Mpesa Transaction
     public function LipaNaMpesaPassword()
