@@ -1,5 +1,5 @@
 {
-  "name": "iankumu/mpesa",
+  "name": "amoori/mpesa",
   "description": "A package that helps integrate the Mpesa APIs to your Laravel Project",
   "type": "library",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "pestphp/pest": "^1.0 |^2.0"
   },
   "require": {
-    "php": "^8.0 | ^8.1 | ^8.2",
+    "php": "7.4 | ^8.0 | ^8.1 | ^8.2",
     "illuminate/support": "^8.0 | ^9.0 | ^10.0 | ^11.0",
     "illuminate/http":"^8.0 | ^9.0 | ^10.0 | ^11.0",
     "guzzlehttp/guzzle": "^7.5"
